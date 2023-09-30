@@ -14,9 +14,18 @@ To run the project locally you only need Docker Compose. Without Docker, you mig
 - [PostgreSQL](https://www.postgresql.org/download/)
 - [Apache Kafka](https://kafka.apache.org/quickstart)
 - [npm](https://docs.npmjs.com/getting-started)
-## Clone the Repository 
+## Clone the Repositories
+- Consumer
 ```bash
 $ git clone git@github.com:ppzzmm/rust-pzm-project.git && cd rust-pzm-project
+```
+- Service to buy/sale stocks
+```bash
+$ git clone git@github.com:ppzzmm/stocks-endpoints.git
+```
+- Service to buy/sale stocks
+```bash
+$ git@github.com:ppzzmm/stocks-services-graphql.git
 ```
 ## Run project
 ### With Docker
