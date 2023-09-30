@@ -36,7 +36,7 @@ In this case we are going to use docker to run the projects, first of all we hav
 ```bash
 $ docker network create stocks-app
 ```
-- Command to create a zookeeper container:
+- Command to create a **zookeeper** container:
 ```bash
 $ docker run --name=zookeeper -d \
  --network stocks-app \
@@ -46,7 +46,7 @@ $ docker run --name=zookeeper -d \
  -p 2181:2181 \
  wurstmeister/zookeeper 
 ```
-- Command to create a kafka container:
+- Command to create a **kafka** container:
 ```bash
 $ docker run --name=kafka -d \
  --network stocks-app \
@@ -59,7 +59,7 @@ $ docker run --name=kafka -d \
  -p 9092:9092 \
  wurstmeister/kafka
 ```
-- Command to create our Postgres DataBase container:
+- Command to create our **Postgres DataBase** container:
 ```bash
 $ docker run -d \
  --name stock-db \
@@ -69,7 +69,7 @@ $ docker run -d \
  -e POSTGRES_PASSWORD=password \
  postgres
 ```
-- Step inside the stocks-consumer project folder and run this commands, the fisrt command build the project and the next command creates the container:
+- Step inside the **stocks-consumer** project folder and run this commands, the fisrt command build the project and the next command creates the container:
 ```bash
 $ docker build -t stocks-consumer .
 ```
@@ -83,7 +83,7 @@ $ docker run \
  -e KAFKA_BROKER=kafka:9092 \
  stocks-consumer
 ```
-- Step inside the stocks-endpoints project folder and run this commands, the fisrt command build the project and the next command creates the container:
+- Step inside the **stocks-endpoints** project folder and run this commands, the fisrt command build the project and the next command creates the container:
 ```bash
 $ docker build -t stocks-endpoints .
 ```
@@ -97,7 +97,7 @@ $ docker run \
  -e KAFKA_BROKER=kafka:9092 \
  stocks-endpoints
 ```
-- Step inside the stocks-services-graphql project folder and run this commands, the fisrt command build the project and the next command creates the container:
+- Step inside the **stocks-services-graphql** project folder and run this commands, the fisrt command build the project and the next command creates the container:
 ```bash
 $ docker build -t stocks-services-graphql .
 ```
@@ -133,18 +133,23 @@ $ bin/kafka-topics.sh --create --topic topic-stocks --bootstrap-server localhost
 $ bin/kafka-console-consumer.sh --topic topic-stocks --from-beginning --bootstrap-server localhost:9092
 $ bin/kafka-console-producer.sh --topic topic-stocks --bootstrap-server localhost:9092
 ```
+### Create the Postgres DataBase
+- Install [postgres](https://www.postgresql.org/) in your machine, and run in a terminal this:
+```bash
+$ createdb postgres
+```
 #### Run the applications and services
-- Placed within the project, first we have to run the **stocks-service** project because that contain the migrations to create the database tables, in this project we have the **GrapHQL** endpoints to get the information about the stocks:
+- Placed inside the **stocks-consumer** project in a terminal, first we have to run this project because that contain the migrations to create the database tables, here we have the kafka consumer to process the stocks that the user bought or sold:
 ```bash
-$ cargo run -p stocks-service
+$ cargo run
 ```
-- Placed inside the project but in another terminal, run the following command to load the **consumer-stocks-service** service, here we have the kafka consumer to process the stocks that the user bought or sold:
+- Placed inside the **stocks-services-graphql** project in another terminal, in this project we have the **GrapHQL** endpoints to get the information about the stocks, run the following command:
 ```bash
-$ cargo run -p consumer-stocks-service
+$ cargo run
 ```
-- To finish the project launch we have this **Rest API** in rust to buy or sale stocks, this endpoints send an event in the kafka topic to the consumer (**consumer-stocks-service**) process the information:
+- Placed inside the **stocks-endpointsr** project in another terminal, to finish the project launch we have this **Rest API** in rust to buy or sale stocks, this endpoints send an event in the kafka topic to the consumer (**stocks-consumer**) process the information:
 ```bash
-$ cargo run -p stocks-endpoints 
+$ cargo run
 ```
 ### Testing
 - [Here](https://documenter.getpostman.com/view/2220937/2s9YJW55ye#4a2e2bf0-07ee-4066-84a8-db120f3dfb96) you can see how to run the services in postman:
@@ -165,20 +170,6 @@ $curl 'http://localhost:8001/stocks' -H 'Accept-Encoding: gzip, deflate, br' -H 
     highestPrice
     averagePrice
     priceByHours
-  }
-}
-
-or to buy stocks with mutation option:
-
-mutation{
-  buyStocks(
-    stock: {
-      symbol: "APP",
-      shares: 212
-    }
-  )
-  {
-    id
   }
 }
 ```
