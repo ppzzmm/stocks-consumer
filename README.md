@@ -4,10 +4,10 @@ That are some of main technologies used in the project:
 - [Rust](https://www.rust-lang.org/)
 - [Async-graphql](https://async-graphql.github.io/async-graphql/en/index.html)
 - [Apache Kafka](https://kafka.apache.org/)
-- [Docker Compose](https://docs.docker.com/compose/)
+- [Docker](https://www.docker.com/)
 - [PostgreSQL](https://www.postgresql.org/)
 ## Prerequisites
-To run the project locally you only need Docker Compose. Without Docker, you might need to install the following:
+To run the project locally you only need Docker. Without Docker, you might need to install the following:
 - [Rust](https://www.rust-lang.org/tools/install)
 - [Diesel CLI](https://diesel.rs/guides/getting-started.html)
 - [CMake](https://cmake.org/install/) 
@@ -15,9 +15,10 @@ To run the project locally you only need Docker Compose. Without Docker, you mig
 - [Apache Kafka](https://kafka.apache.org/quickstart)
 - [npm](https://docs.npmjs.com/getting-started)
 ## Clone the Repositories
+In your workspace clone this repositories:
 - Consumer
 ```bash
-$ git clone git@github.com:ppzzmm/rust-pzm-project.git && cd rust-pzm-project
+$ git clone git@github.com:ppzzmm/stocks-consumer.git
 ```
 - Service to buy/sale stocks
 ```bash
@@ -29,14 +30,87 @@ $ git@github.com:ppzzmm/stocks-services-graphql.git
 ```
 ## Run project
 ### With Docker
-We have two options:
-- Using locally built images:
+In this case we are going to use docker to run the projects, first of all we have to create our zookeeper, kafka and database images, first we need zookeeper because it wil be necessary to raise kafka:
+
+- We are going to create a network to put our containers, step inside on your workspace and run this commands:
 ```bash
-$ docker-compose up --build
+$ docker network create stocks-app
 ```
-- Using released images:
+- Command to create a zookeeper container:
 ```bash
-$ docker-compose -f docker-compose.yml up
+$ docker run --name=zookeeper -d \
+ --network stocks-app \
+ --network-alias zookeeper \
+ -e ZOOKEEPER_CLIENT_PORT=2181 \
+ -e ZOOKEEPER_TICK_TIME=2000 \
+ -p 2181:2181 \
+ wurstmeister/zookeeper 
+```
+- Command to create a kafka container:
+```bash
+$ docker run --name=kafka -d \
+ --network stocks-app \
+ --network-alias kafka \
+ -e KAFKA_CREATE_TOPICS="topic-stocks:1:1" \
+ -e KAFKA_BROKER_ID=1 \
+ -e KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181 \
+ -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092 \
+ -e KAFKA_LISTENERS=PLAINTEXT://kafka:9092 \
+ -p 9092:9092 \
+ wurstmeister/kafka
+```
+- Command to create our Postgres DataBase container:
+```bash
+$ docker run -d \
+ --name stock-db \
+ --network stocks-app \
+ --network-alias stock-db \
+ -p 5432:5432 \
+ -e POSTGRES_PASSWORD=password \
+ postgres
+```
+- Step inside the stocks-consumer project folder and run this commands, the fisrt command build the project and the next command creates the container:
+```bash
+$ docker build -t stocks-consumer .
+```
+```bash
+$ docker run \
+ --name=stocks-consumer \
+ --network stocks-app \
+ --network-alias stocks-consumer \
+ -dp 8002:8080 \
+ -e DATABASE_URL=postgres://postgres:password@stock-db:5432/postgres \
+ -e KAFKA_BROKER=kafka:9092 \
+ stocks-consumer
+```
+- Step inside the stocks-endpoints project folder and run this commands, the fisrt command build the project and the next command creates the container:
+```bash
+$ docker build -t stocks-endpoints .
+```
+```bash
+$ docker run \
+ --name=stocks-endpoints \
+ --network stocks-app \
+ --network-alias stocks-endpoints \
+ -dp 8080:8080 \
+ -e DATABASE_URL=postgres://postgres:password@stock-db:5432/postgres \
+ -e KAFKA_BROKER=kafka:9092 \
+ stocks-endpoints
+```
+- Step inside the stocks-services-graphql project folder and run this commands, the fisrt command build the project and the next command creates the container:
+```bash
+$ docker build -t stocks-services-graphql .
+```
+```bash
+$ docker run \
+ --name=stocks-services-graphql \
+ --network stocks-app \
+ --network-alias stocks-services-graphql \
+ -dp 8001:8080 \
+ -e DATABASE_URL=postgres://postgres:password@stock-db:5432/postgres \
+ -e KAFKA_BROKER=kafka:9092 \
+ -e SERVER_PORT=8001 \
+ stocks-services-graphql
 ```
 ### Without Docker
 #### Setting Kafka and Zookeeper
