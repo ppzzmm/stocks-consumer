@@ -3,11 +3,6 @@ RUN apt-get update && apt-get install -y libpq-dev cmake
 
 WORKDIR /app
 
-# # accept the build argument
-# ARG DATABASE_URL
-
-# ENV DATABASE_URL=$DATABASE_URL
-
 COPY . . 
 
 RUN cargo build --release
