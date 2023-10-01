@@ -110,7 +110,7 @@ $ docker run \
  -dp 8001:8080 \
  -e DATABASE_URL=postgres://postgres:password@stock-db:5432/postgres \
  -e KAFKA_BROKER=kafka:9092 \
- -e SERVER_PORT=8001 \
+ -e SERVER_PORT=8080 \
  stocks-services-graphql
 ```
 ### Without Docker
