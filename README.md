@@ -1,4 +1,4 @@
-# Buy/Sale Stocks
+# Buy/Sell Stocks
 This project provide an API GraphQL service to buy/sell stocks and hold stocks and track portafolio performance. We use Kafka to queue message to execute the buy/sell orders independently of the API service.
 ## Stack of technologies
 That are some of main technologies used in the project:
@@ -21,7 +21,7 @@ In your workspace clone this repositories:
 ```bash
 $ git clone git@github.com:ppzzmm/stocks-consumer.git
 ```
-- Service to buy/sale stocks
+- Service to buy/sell stocks
 ```bash
 $ git clone git@github.com:ppzzmm/stocks-endpoints.git
 ```
@@ -148,7 +148,7 @@ $ cargo run
 ```bash
 $ cargo run
 ```
-- Placed inside the **stocks-endpointsr** project in another terminal, to finish the project launch we have this **Rest API** in rust to buy or sale stocks, this endpoints send an event in the kafka topic to the consumer (**stocks-consumer**) process the information:
+- Placed inside the **stocks-endpointsr** project in another terminal, to finish the project launch we have this **Rest API** in rust to buy or sell stocks, this endpoints send an event in the kafka topic to the consumer (**stocks-consumer**) process the information:
 ```bash
 $ cargo run
 ```
@@ -160,7 +160,7 @@ $ cargo test
 ### Testing
 - [Here](https://documenter.getpostman.com/view/2220937/2s9YJW55ye#4a2e2bf0-07ee-4066-84a8-db120f3dfb96) you can see how to run the services in postman:
   <img width="1657" alt="Screenshot 2023-09-23 at 23 47 41" src="https://github.com/ppzzmm/rust-pzm-project/assets/29339482/a9b7ab8e-031e-4c8f-9fe3-9c27e7c0b78f">
-- If you already used the endpoints to buy or sale stocks, page this command Curl in a terminal to see the information:
+- If you already used the endpoints to buy or sell stocks, page this command Curl in a terminal to see the information:
 ```bash
 $curl 'http://localhost:8001/stocks' -H 'Accept-Encoding: gzip, deflate, br' -H 'Content-Type: application/json' -H 'Accept: application/json' -H 'Connection: keep-alive' -H 'DNT: 1' -H 'Origin: http://localhost:8001' --data-binary '{"query":"{\n  stocksSummary {\n    symbol\n    profitLoss\n    shares\n    totalValue\n    lowestPrice\n    highestPrice\n    averagePrice\n    priceByHours\n  }\n}"}' --compressed
 ```
