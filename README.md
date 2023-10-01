@@ -1,4 +1,5 @@
 # Buy/Sale Stocks
+This project provide an API GraphQL service to buy/sell stocks and hold stocks and track portafolio performance. We use Kafka to queue message to execute the buy/sell orders independently of the API service.
 ## Stack of technologies
 That are some of main technologies used in the project:
 - [Rust](https://www.rust-lang.org/)
@@ -24,7 +25,7 @@ $ git clone git@github.com:ppzzmm/stocks-consumer.git
 ```bash
 $ git clone git@github.com:ppzzmm/stocks-endpoints.git
 ```
-- Service to buy/sale stocks
+- GraphQL service to see your portafolio performance
 ```bash
 $ git@github.com:ppzzmm/stocks-services-graphql.git
 ```
