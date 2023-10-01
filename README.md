@@ -151,6 +151,11 @@ $ cargo run
 ```bash
 $ cargo run
 ```
+### Run tests
+- To run the tests, step inside the **stocks-consumer** project folder and run this command:
+```bash
+$ cargo test
+```
 ### Testing
 - [Here](https://documenter.getpostman.com/view/2220937/2s9YJW55ye#4a2e2bf0-07ee-4066-84a8-db120f3dfb96) you can see how to run the services in postman:
   <img width="1657" alt="Screenshot 2023-09-23 at 23 47 41" src="https://github.com/ppzzmm/rust-pzm-project/assets/29339482/a9b7ab8e-031e-4c8f-9fe3-9c27e7c0b78f">
