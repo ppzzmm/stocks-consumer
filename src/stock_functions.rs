@@ -3,13 +3,15 @@ use serde::{Deserialize, Serialize};
 use async_graphql::*;
 use crate::persistence::model::{StocksEntity, NewStocksEntity, StocksSummaryEntity, NewStocksSummaryEntity};
 use crate::persistence::repository;
-use crate::persistence::connection::create_connection_pool;
 use diesel::prelude::*;
 use diesel::sql_query;
 use diesel::sql_types::*;
 use crate::persistence::schema::stocks_summary;
+use diesel::r2d2::{ConnectionManager, PooledConnection};
+use diesel::PgConnection;
 
-pub fn save_stock(symbol: String, shares: i32, price: String, percentage_change: String, action: String) {
+pub fn save_stock(symbol: String, shares: i32, price: String, percentage_change: String,
+                  action: String, conn: &mut PooledConnection<ConnectionManager<PgConnection>>) {
     let new_stocks = NewStocksEntity {
         symbol: symbol,
         shares: shares,
@@ -18,16 +20,15 @@ pub fn save_stock(symbol: String, shares: i32, price: String, percentage_change:
         action_type: action,
         user_id: 1,
     };
-    let pool = create_connection_pool();
     repository::create_stock(
-        new_stocks, &mut pool.get().expect("Can't get DB connection")
+        new_stocks, conn
     ).expect("Error to create a stock");
 }
 
-pub fn calculate_stock_summary(symbol: String, shares: i32, price: String, percentage_change: String) {
-    let pool = create_connection_pool();
+pub fn calculate_stock_summary(symbol: String, shares: i32, price: String,
+                               percentage_change: String, conn: &mut PooledConnection<ConnectionManager<PgConnection>> ) {
     let stocks_by_symbol = repository::get_stocks_by_symbol(
-        symbol.to_string(), &mut pool.get().expect("Can't get DB connection")
+        symbol.to_string(), conn
     );
     let mut total_price:BigDecimal = "0.0".parse().unwrap();
     let mut total_percentage_change:BigDecimal = "0.0".parse().unwrap();
@@ -61,7 +62,7 @@ pub fn calculate_stock_summary(symbol: String, shares: i32, price: String, perce
         }
         average_price = total_price_to_get_average_price / stocks_by_symbol.len().to_string().parse::<BigDecimal>().unwrap();
         profit_loss = total_percentage_change / stocks_by_symbol.len().to_string().parse::<BigDecimal>().unwrap();
-        prices_by_hour = calculate_prices_by_hour(symbol.to_string());
+        prices_by_hour = calculate_prices_by_hour(symbol.to_string(), conn);
     } else {
         prices.push(price.parse::<BigDecimal>().unwrap());
         total_price = price.parse::<BigDecimal>().unwrap();
@@ -83,17 +84,17 @@ pub fn calculate_stock_summary(symbol: String, shares: i32, price: String, perce
         user_id: 1
     };
     let stock_summary_by_symbol = repository::get_stock_summary_by_symbol(
-        symbol.to_string(), &mut pool.get().expect("Can't get DB connection")
+        symbol.to_string(), conn
     );
     match stock_summary_by_symbol {
         None => {
             repository::create_stock_summary(
-                new_stocks_summary, &mut pool.get().expect("Can't get DB connection")
+                new_stocks_summary, conn
             ).expect("Error to create a stock summary");
         }
         _ => {
             repository::update_stock_summary(
-                new_stocks_summary, &mut pool.get().expect("Can't get DB connection")
+                new_stocks_summary, conn
             ).expect("Error to update a stock summary");
         },
     }
@@ -109,8 +110,7 @@ pub struct StocksByHours {
    pub hour : String,
 }
 
-pub fn calculate_prices_by_hour(symbol: String) -> String {
-    let pool = create_connection_pool();
+pub fn calculate_prices_by_hour(symbol: String, conn: &mut PooledConnection<ConnectionManager<PgConnection>>) -> String {
     let query = format!(
         "
         SELECT symbol,
@@ -124,7 +124,7 @@ pub fn calculate_prices_by_hour(symbol: String) -> String {
         symbol
     );
     let results = sql_query(query)
-        .load::<StocksByHours>(&mut pool.get().expect("Can't get DB connection"))
+        .load::<StocksByHours>(conn)
         .unwrap();
     println!("{:?}",results);
     let mut stocks_by_hour = "".to_string();

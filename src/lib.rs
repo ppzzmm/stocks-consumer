@@ -13,7 +13,7 @@ pub fn run_migrations(conn: &mut PooledConnection<ConnectionManager<PgConnection
         .expect("Failed to run database migrations");
 }
 
-pub fn buy_stocks(symbol: String, shares: String, action: String) {
+pub fn buy_stocks(symbol: String, shares: String, action: String, conn: &mut PooledConnection<ConnectionManager<PgConnection>>) {
     let result = common_utils::get_stock_from_nasdaq(symbol.to_string());
     if result.success == false {
         return;
@@ -35,12 +35,15 @@ pub fn buy_stocks(symbol: String, shares: String, action: String) {
         shares.parse::<i32>().unwrap(), 
         price.to_string(), 
         percentage_change.to_string(),
-        action.to_string());
+        action.to_string(),
+        conn
+    );
     calculate_stock_summary(
         symbol.to_string(),
         shares.parse::<i32>().unwrap(),
         price.to_string(),
-        percentage_change.to_string()
+        percentage_change.to_string(),
+        conn
     );
 }
 

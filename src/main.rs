@@ -36,7 +36,11 @@ fn main() {
             let symbol = collection[0];
             let shares = collection[1];
             let action = collection[2];
-            buy_stocks(symbol.to_string(), shares.to_string(), action.to_string());
+            buy_stocks(
+              symbol.to_string(),
+              shares.to_string(),
+              action.to_string(),
+              &mut pool.get().expect("Can't get DB connection"));
           }
         }
         let _ = consumer.consume_messageset(ms);
