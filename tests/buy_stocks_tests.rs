@@ -32,7 +32,7 @@ mod tests {
             2,
             "123.23".to_string(),
             "0.3".to_string(),
-            "sale".to_string(),
+            "sell".to_string(),
             &mut pool.get().expect("Can't get DB connection")
         );
         calculate_stock_summary(
