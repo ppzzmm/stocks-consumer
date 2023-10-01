@@ -159,7 +159,8 @@ $ cargo test
 ```
 ### Testing
 - [Here](https://documenter.getpostman.com/view/2220937/2s9YJW55ye#4a2e2bf0-07ee-4066-84a8-db120f3dfb96) you can see how to run the services in postman:
-  <img width="1657" alt="Screenshot 2023-09-23 at 23 47 41" src="https://github.com/ppzzmm/rust-pzm-project/assets/29339482/a9b7ab8e-031e-4c8f-9fe3-9c27e7c0b78f">
+ <img width="1674" alt="Screenshot 2023-10-01 at 12 15 35" src="https://github.com/ppzzmm/stocks-consumer/assets/29339482/fafa4542-5449-4913-b70a-485491eba879">
+
 - If you already used the endpoints to buy or sell stocks, page this command Curl in a terminal to see the information:
 ```bash
 $curl 'http://localhost:8001/stocks' -H 'Accept-Encoding: gzip, deflate, br' -H 'Content-Type: application/json' -H 'Accept: application/json' -H 'Connection: keep-alive' -H 'DNT: 1' -H 'Origin: http://localhost:8001' --data-binary '{"query":"{\n  stocksSummary {\n    symbol\n    profitLoss\n    shares\n    totalValue\n    lowestPrice\n    highestPrice\n    averagePrice\n    priceByHours\n  }\n}"}' --compressed
